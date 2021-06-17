@@ -1,10 +1,27 @@
 #include <iostream>
 #include <vector>
 
+
+
+typedef struct matrix_t {
+	// fields
+	int rows;
+	int cols;
+	std::vector<std::vector<double>> matrix;
+
+	// contructors
+	matrix_t();
+	matrix_t(std::vector<std::vector<double>>, int, int);
+
+	// functions
+	void printMatrix();
+} matrix_t;
+
+
+
+
 // function prototypes
-int * getDimensions();
-std::vector<std::vector<double>> getMatrix(int, int);
-void printMatrix(std::vector<std::vector<double>>, int, int);
+matrix_t getMatrix();
 std::vector<int> getPrintDimensions(std::vector<std::vector<double>>, int, int);
 int getCharsInNum(double);
 
@@ -14,14 +31,10 @@ int getCharsInNum(double);
 
 int main() {
 
-	// get dimensions of the matrix
-	int * dimensions = getDimensions();
-
-	printf("rows = %d\ncols = %d\n", dimensions[0], dimensions[1]);
-
-	// get the matrix
-	std::vector<std::vector<double>> matrix = getMatrix(dimensions[0], dimensions[1]);
-	printMatrix(matrix, dimensions[0], dimensions[1]);
+	// create new matrix and fill it with values from the user
+	matrix_t m = getMatrix();
+	m.printMatrix();
+	
 
 } // main()
 
@@ -30,25 +43,18 @@ int main() {
 
 
 
+// constructor with no arguments
+matrix_t::matrix_t() {
+	rows = 0;
+	cols = 0;
+}
 
-/*
- * Gets the dimensions of the matrix from the user.
- * @return -> An int array called "dimensions" where dimensions[0] is the # of rows,
- * 						and dimensions[1] is the # of columns.
- */
-int * getDimensions() {
-	int * dimensions = new int[2];
-
-	printf("Enter the number of rows:  ");
-	std::cin >> dimensions[0];
-
-	printf("Enter the number of columns:  ");
-	std::cin >> dimensions[1];
-
-	return dimensions;
-} // getDimensions()
-
-
+// constructor with arguments
+matrix_t::matrix_t(std::vector<std::vector<double>> theMatrix, int numRows, int numCols) {
+	matrix = theMatrix;
+	rows = numRows;
+	cols = numCols;
+}
 
 
 
@@ -57,19 +63,27 @@ int * getDimensions() {
 
 /*
  * Gets values from the user to fill the matrix.
- * @param rows -> the number of rows in the matrix.
- * @param cols -> the number of columns in the matrix.
- * @return -> a matrix filled with the values provided by the user
+ * Gets the # of rows and # of columns from the user and then gets
+ * values to fill the matrix.
+ * @return -> a matrix structure with a matrix filled with values.
  */
-std::vector<std::vector<double>> getMatrix(int rows, int cols) {
-	std::vector<std::vector<double>> matrix;
+matrix_t getMatrix() {
+	matrix_t m;
+
+	// get the # of rows and # of columns
+	printf("Enter the number of rows:  ");
+	std::cin >> m.rows;
+	printf("Enter the number of columns:  ");
+	std::cin >> m.cols;
+
+	// get the values for the matrix
 	std::vector<double> row;
 	double value;
 
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
+	for (int i = 0; i < m.rows; i++) {
+		for (int j = 0; j < m.cols; j++) {
 			// prints the matrix out for the user
-			printMatrix(matrix, rows, cols);
+			m.printMatrix();
 
 			// gets value from the user and adds it to the current row
 			printf("Enter value:  ");
@@ -78,16 +92,16 @@ std::vector<std::vector<double>> getMatrix(int rows, int cols) {
 			printf("\n\n");
 
 			// updates the row in the matrix
-			if (matrix.size() == i + 1) {
-				matrix.pop_back();
+			if (m.matrix.size() == i + 1) {
+				m.matrix.pop_back();
 			}
-			matrix.push_back(row);
+			m.matrix.push_back(row);
 		}
 
 		row.clear();
 	}	
 
-	return matrix;
+	return m;
 } // getMatrix()
 
 
@@ -101,11 +115,8 @@ std::vector<std::vector<double>> getMatrix(int rows, int cols) {
 /*
  * Prints out the values in the matrix, and if there is no value at
  * a location, then it prints an underscore for that spot.
- * @param matrix -> the matrix and its values.
- * @param rows -> the number of rows in the matrix.
- * @param cols -> the number of cols in the matrix.
  */
-void printMatrix(std::vector<std::vector<double>> matrix, int rows, int cols) {
+void matrix_t::printMatrix() {
 	bool firstUnderscore = true;
 	std::vector<int> dimensions = getPrintDimensions(matrix, rows, cols);
 
@@ -155,6 +166,8 @@ void printMatrix(std::vector<std::vector<double>> matrix, int rows, int cols) {
 	} // end of for-loop
 
 } // printMatrix()
+
+
 
 
 
@@ -220,5 +233,13 @@ int getCharsInNum(double num) {
 
 	return chars;
 } // getCharsInNum()
+
+
+
+
+
+
+
+
 
 
