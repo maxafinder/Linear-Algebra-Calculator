@@ -3,8 +3,11 @@
 
 // function prototypes
 int * getDimensions();
-std::vector<std::vector<int>> getMatrix(int, int);
-void printMatrix(std::vector<std::vector<int>>, int, int);
+std::vector<std::vector<double>> getMatrix(int, int);
+void printMatrix(std::vector<std::vector<double>>, int, int);
+std::vector<int> getPrintDimensions(std::vector<std::vector<double>>, int, int);
+int getCharsInNum(double);
+
 
 
 
@@ -17,7 +20,7 @@ int main() {
 	printf("rows = %d\ncols = %d\n", dimensions[0], dimensions[1]);
 
 	// get the matrix
-	std::vector<std::vector<int>> matrix = getMatrix(dimensions[0], dimensions[1]);
+	std::vector<std::vector<double>> matrix = getMatrix(dimensions[0], dimensions[1]);
 	printMatrix(matrix, dimensions[0], dimensions[1]);
 
 } // main()
@@ -58,10 +61,10 @@ int * getDimensions() {
  * @param cols -> the number of columns in the matrix.
  * @return -> a matrix filled with the values provided by the user
  */
-std::vector<std::vector<int>> getMatrix(int rows, int cols) {
-	std::vector<std::vector<int>> matrix;
-	std::vector<int> row;
-	int value;
+std::vector<std::vector<double>> getMatrix(int rows, int cols) {
+	std::vector<std::vector<double>> matrix;
+	std::vector<double> row;
+	double value;
 
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
@@ -102,23 +105,45 @@ std::vector<std::vector<int>> getMatrix(int rows, int cols) {
  * @param rows -> the number of rows in the matrix.
  * @param cols -> the number of cols in the matrix.
  */
-void printMatrix(std::vector<std::vector<int>> matrix, int rows, int cols) {
+void printMatrix(std::vector<std::vector<double>> matrix, int rows, int cols) {
 	bool firstUnderscore = true;
+	std::vector<int> dimensions = getPrintDimensions(matrix, rows, cols);
 
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 
 			// the value is in the matrix
 			if (matrix.size() > i && matrix[i].size() > j) {
-				printf("%d ", matrix[i][j]);
+
+				// if its an integer
+				if ((int) matrix[i][j] == matrix[i][j]) {
+					printf("%d", (int) matrix[i][j]);
+				}
+				// its a decimal
+				else {
+					printf("%.2f", matrix[i][j]);
+				}
+
 			}
 			// print an underscore as the value
 			else if (firstUnderscore) {
-				printf("? ");
+				printf("?");
 				firstUnderscore = false;
 			}
 			else {
-				printf("_ ");
+				printf("_");
+			}
+
+			// print necessary spaces
+			if (matrix.size() > i && matrix[i].size() > j) {
+				for (int k = 0; k < (dimensions[j] - getCharsInNum(matrix[i][j])); k++) {
+					printf(" ");
+				}
+			}
+			else {
+				for (int k = 0; k < (dimensions[j] - 1); k++) {
+					printf(" ");
+				}
 			}
 
 			// if we are at the end of a row then print a newline
@@ -126,8 +151,9 @@ void printMatrix(std::vector<std::vector<int>> matrix, int rows, int cols) {
 				printf("\n");
 			}
 
-		}
-	}
+		} // end of for-loop
+	} // end of for-loop
+
 } // printMatrix()
 
 
@@ -136,5 +162,63 @@ void printMatrix(std::vector<std::vector<int>> matrix, int rows, int cols) {
 
 
 
+
+/*
+ * Returns a vector which has the number of characters that should
+ * be printed for each column.
+ * 
+ */
+std::vector<int> getPrintDimensions(std::vector<std::vector<double>> matrix, int rows, int cols) {
+	std::vector<int> dimensions;
+	int max;
+
+	for (int j = 0; j < cols; j++) {
+		max = 1;
+		for (int i = 0; i < rows; i++) {
+			
+			if (matrix.size() > i && matrix[i].size() > j) {
+				if (getCharsInNum(matrix[i][j]) > max) {
+					max = getCharsInNum(matrix[i][j]);	
+				}
+			}
+
+		}
+
+		dimensions.push_back(max + 2);
+	}
+
+	return dimensions;	
+} // getPrintDimensions()
+
+
+
+
+
+
+
+/*
+ * Returns that amount of characters in the number if the decimal
+ * is rounded to 2 decimal places and then accounts for 2 added spaces
+ * after the number.
+ * @param num -> the number that we will find the # of characters for.
+ * @return -> the number of characters that the number takes up.
+ */
+int getCharsInNum(double num) {
+	int chars = 0;
+	
+	// if its a decimal then add 3 characters for ".xx"
+	if ((int) num != num) {
+		chars += 3;
+	}
+
+	// find the number of chars before the decimal place
+	int rounded = (int) num;
+	while (rounded != 0) {
+		chars++;
+		rounded = rounded/10;
+	}
+
+	return chars;
+} // getCharsInNum()
 
 
