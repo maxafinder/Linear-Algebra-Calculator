@@ -29,6 +29,7 @@ typedef struct matrix_t {
 matrix_t getMatrix();
 std::vector<int> getPrintDimensions(std::vector<std::vector<double>>, int, int);
 int getCharsInNum(double);
+matrix_t moveZerosToBottom(matrix_t, int, int);
 
 
 
@@ -39,6 +40,15 @@ int main() {
 	// create new matrix and fill it with values from the user
 	matrix_t m = getMatrix();
 	m.printMatrix();
+
+
+	// TEST
+	matrix_t echelonMatrix = m.getEchelonForm();
+	printf("\n\nEchelon Form: \n");
+	echelonMatrix.printMatrix();
+	printf("\n\nOriginal: \n");
+	m.printMatrix();
+
 
 } // main()
 
@@ -182,11 +192,61 @@ void matrix_t::printMatrix() {
  * @return -> A matrix that contains the Echelon form of the given matrix.
  */
 matrix_t matrix_t::getEchelonForm() {
-	matrix_t echelon;
-	echelon.matrix = matrix;
+	matrix_t echelonMatrix;
+	echelonMatrix.rows = rows;
+	echelonMatrix.cols = cols;
+	echelonMatrix.matrix = matrix;
 
-	return echelon;
+
+	echelonMatrix = moveZerosToBottom(echelonMatrix, 0, 0);
+
+/*
+	int pivot = 0;
+	// Go through the rows
+	for (int i = 0; i < echelonMatrix.matrix.size(); i++) {
+
+		
+	}
+*/
+
+	
+
+	return echelonMatrix;
 } // getEchelonForm()
+
+
+
+
+
+
+/*
+ * Moves any rows that are below "row" that have a zero in "col" to the bottom of the matrix.
+ * @param m -> the matrix that we are working with.
+ * @param row -> the first row that we will consider to swap.
+ * @param col -> the column that we are looking for zeros in.
+ * @return -> the matrix with the zeros at the bottom for that column.
+ */
+matrix_t moveZerosToBottom(matrix_t m, int row, int col) {
+
+	for (int i = row; i < m.matrix.size(); i++) {
+		
+		// we swap
+		if (m.matrix[i][col] == 0) {
+
+			// look for row to swap with
+			for (int j = i + 1; j < m.matrix.size(); j++) {
+				if (m.matrix[j][col] != 0) {
+					m.swap(i, j);	
+				}
+			}
+		}
+
+	} // for-loop
+
+	return m;
+} // moveZerosToBottom()
+
+
 
 
 
@@ -290,6 +350,9 @@ int getCharsInNum(double num) {
 
 	// find the number of chars before the decimal place
 	int rounded = (int) num;
+	if (rounded == 0) {
+		chars++;
+	}
 	while (rounded != 0) {
 		chars++;
 		rounded = rounded/10;
