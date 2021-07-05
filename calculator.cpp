@@ -2,9 +2,8 @@
 #include <vector>
 
 
-
+// struct to hold information about a matrix
 typedef struct matrix_t {
-	// fields
 	int rows;
 	int cols;
 	std::vector<std::vector<double>> matrix;
@@ -15,6 +14,12 @@ typedef struct matrix_t {
 
 	// functions
 	void printMatrix();
+	matrix_t getEchelonForm();
+	void swap(int, int);
+	void replace(int, double, int);
+	void scale(int, double);
+
+
 } matrix_t;
 
 
@@ -34,7 +39,6 @@ int main() {
 	// create new matrix and fill it with values from the user
 	matrix_t m = getMatrix();
 	m.printMatrix();
-	
 
 } // main()
 
@@ -171,6 +175,66 @@ void matrix_t::printMatrix() {
 
 
 
+// TODO
+/*
+ * Calculates the Echelon form of the matrix and then returns a new matrix
+ * containing the values of the Echelon form.
+ * @return -> A matrix that contains the Echelon form of the given matrix.
+ */
+matrix_t matrix_t::getEchelonForm() {
+	matrix_t echelon;
+	echelon.matrix = matrix;
+
+	return echelon;
+} // getEchelonForm()
+
+
+
+
+/*
+ * Swaps row1 with row2 in the matrix.
+ * @param row1 -> the first row that we are swapping.
+ * @param row2 -> the second row that we are swapping.
+ */
+void matrix_t::swap(int row1, int row2) {
+	std::vector<double> temp;
+	temp = matrix[row2];
+
+	matrix[row2] = matrix[row1];
+	matrix[row1] = temp;
+} // swap()
+
+
+
+
+
+
+/*
+ * Replaces adds row1 multiplied by a scale to row2 and replaces row2.
+ * @param row1 -> the row in the matrix that we will scale and add to row2.
+ * @param scale -> the scale that we are multiplying row1 by.
+ * @param row2 -> the row that we are replacing.
+ */
+void matrix_t::replace(int row1, double scale, int row2) {
+	for (int i = 0; i < matrix[row1].size(); i++) {
+		matrix[row2][i] = (matrix[row1][i] * scale) + matrix[row2][i];
+	}
+} // replace()
+
+
+
+
+
+/*
+ * Scales the specified row by the scale.
+ * @param row -> the row that we will be scaling.
+ * @param scale -> the scale that we are multiplying the row by.
+ */
+void matrix_t::scale(int row, double scale) {
+	for (int i = 0; i < matrix[row].size(); i++) {
+		matrix[row][i] = matrix[row][i] * scale;
+	}
+} // scale()
 
 
 
