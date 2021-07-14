@@ -14,7 +14,7 @@ typedef struct matrix_t {
 
 	// functions
 	void printMatrix();
-	matrix_t getEchelonForm();
+	matrix_t getReducedEchelonForm();
 	void swap(int, int);
 	void replace(int, double, int);
 	void scale(int, double);
@@ -30,6 +30,8 @@ matrix_t getMatrix();
 std::vector<int> getPrintDimensions(std::vector<std::vector<double>>, int, int);
 int getCharsInNum(double);
 matrix_t moveZerosToBottom(matrix_t, int, int);
+matrix_t zeroColumnBottom(matrix_t, int , int);
+matrix_t zeroColumnTop(matrix_t, int, int);
 
 
 
@@ -43,11 +45,12 @@ int main() {
 
 
 	// TEST
-	matrix_t echelonMatrix = m.getEchelonForm();
-	printf("\n\nEchelon Form: \n");
-	echelonMatrix.printMatrix();
+	matrix_t echelonMatrix = m.getReducedEchelonForm();
+
 	printf("\n\nOriginal: \n");
 	m.printMatrix();
+	printf("\n\nEchelon Form: \n");
+	echelonMatrix.printMatrix();
 
 
 } // main()
@@ -185,34 +188,53 @@ void matrix_t::printMatrix() {
 
 
 
-// TODO
 /*
  * Calculates the Echelon form of the matrix and then returns a new matrix
  * containing the values of the Echelon form.
  * @return -> A matrix that contains the Echelon form of the given matrix.
  */
-matrix_t matrix_t::getEchelonForm() {
+matrix_t matrix_t::getReducedEchelonForm() {
 	matrix_t echelonMatrix;
 	echelonMatrix.rows = rows;
 	echelonMatrix.cols = cols;
 	echelonMatrix.matrix = matrix;
 
-
 	echelonMatrix = moveZerosToBottom(echelonMatrix, 0, 0);
 
-/*
-	int pivot = 0;
-	// Go through the rows
-	for (int i = 0; i < echelonMatrix.matrix.size(); i++) {
+	// find a pivot column in every column
+	int row = 0;
+	for (int col = 0; col < echelonMatrix.cols; col++) {
+		// move the zeros to the bottom for all rows beneath row
+		echelonMatrix = moveZerosToBottom(echelonMatrix, row, col);	
 
-		
+		// find the next pivot column
+		while (col < echelonMatrix.cols - 1 && echelonMatrix.matrix[row][col] == 0) {
+			col++;
+			echelonMatrix = moveZerosToBottom(echelonMatrix, row, col);	
+		}
+
+		// zero the column out
+		echelonMatrix = zeroColumnBottom(echelonMatrix, row, col);
+		row++;
+		if (row == echelonMatrix.rows) {
+			break;
+		}
 	}
-*/
 
-	
+
+	// zero out the tops of the columns	
+	for (int i = 0; i < echelonMatrix.rows; i++) {
+		for (int j = 0; j < echelonMatrix.matrix[i].size(); j++) {
+			// if we find a pivot column, then zero the columns above it
+			if (echelonMatrix.matrix[i][j] != 0) {
+				echelonMatrix = zeroColumnTop(echelonMatrix, i, j);
+				break;
+			}
+		}
+	}
 
 	return echelonMatrix;
-} // getEchelonForm()
+} // getReducedEchelonForm()
 
 
 
@@ -227,9 +249,7 @@ matrix_t matrix_t::getEchelonForm() {
  * @return -> the matrix with the zeros at the bottom for that column.
  */
 matrix_t moveZerosToBottom(matrix_t m, int row, int col) {
-
 	for (int i = row; i < m.matrix.size(); i++) {
-		
 		// we swap
 		if (m.matrix[i][col] == 0) {
 
@@ -240,12 +260,60 @@ matrix_t moveZerosToBottom(matrix_t m, int row, int col) {
 				}
 			}
 		}
-
 	} // for-loop
 
 	return m;
 } // moveZerosToBottom()
 
+
+
+
+
+
+/*
+ * 
+ */
+matrix_t zeroColumnBottom(matrix_t m, int row, int col) {
+	if (m.matrix[row][col] == 0) {
+		return m;
+	}
+
+	// scale the row so that the entry in col is 1
+	double scale = 1.0 / m.matrix[row][col];
+	m.scale(row, scale);
+	m.matrix[row][col] = 1;
+
+	// row replace every row underneath "row"	so that there are all zeros in that column
+	for (int i = row + 1; i < m.matrix.size(); i++) {
+		scale = -1 * m.matrix[i][col];
+		m.replace(row, scale, i);
+	}
+
+	// return the matrix
+	return m;
+} // zeroColumnBottom()
+
+
+
+
+
+
+/*
+ * Zero out all of the entries in the column "col" above "row".
+ * @param m -> the matrix
+ * @param row -> the row that we are going to zero out above.
+ * @param col -> the column that we are going to zero out.
+ */
+matrix_t zeroColumnTop(matrix_t m, int row, int col) {
+	// for each row above row find the scale to make it zero
+	double scale;
+	for (int i = row - 1; i >= 0; i--) {
+		scale = -1 * m.matrix[i][col];
+		m.replace(row, scale, i);	
+	}
+	
+	return m;
+} // zeroColumnBottom()
 
 
 
@@ -343,6 +411,11 @@ std::vector<int> getPrintDimensions(std::vector<std::vector<double>> matrix, int
 int getCharsInNum(double num) {
 	int chars = 0;
 	
+	// if its negative then add a character
+	if (num < 0) {
+		chars++;
+	}
+
 	// if its a decimal then add 3 characters for ".xx"
 	if ((int) num != num) {
 		chars += 3;
