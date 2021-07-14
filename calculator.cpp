@@ -271,7 +271,11 @@ matrix_t moveZerosToBottom(matrix_t m, int row, int col) {
 
 
 /*
- * 
+ * Performs row replacement on all of the rows below "row" so that every entry in col is 0.
+ * @param m -> the matrix.
+ * @param row -> the row that we are going to zero the entries below.
+ * @param col -> the column that we are zeroing out.
+ * @return -> the matrix after the operation is performed.
  */
 matrix_t zeroColumnBottom(matrix_t m, int row, int col) {
 	if (m.matrix[row][col] == 0) {
@@ -303,6 +307,7 @@ matrix_t zeroColumnBottom(matrix_t m, int row, int col) {
  * @param m -> the matrix
  * @param row -> the row that we are going to zero out above.
  * @param col -> the column that we are going to zero out.
+ * @return -> the matrix after the operation is performed.
  */
 matrix_t zeroColumnTop(matrix_t m, int row, int col) {
 	// for each row above row find the scale to make it zero
