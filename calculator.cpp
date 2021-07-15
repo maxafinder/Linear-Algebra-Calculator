@@ -49,7 +49,7 @@ int main() {
 
 	printf("\n\nOriginal: \n");
 	m.printMatrix();
-	printf("\n\nEchelon Form: \n");
+	printf("\n\nReduced Echelon Form: \n");
 	echelonMatrix.printMatrix();
 
 
